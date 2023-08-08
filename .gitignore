@@ -1,6 +1,6 @@
 /node_modules
 /cache
 /artifacts
-./env.json
-./package-lock.json
+env.json
+package-lock.json
 .env
