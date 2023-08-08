@@ -1,6 +1,6 @@
-const deployLpToken = require("../deployLpToken.js");
+const deployToken = require("../deployToken.js");
 const deploy_core = async () => {
-    await deployLpToken()
+    await deployToken()
 }
 
 module.exports = { deploy_core };

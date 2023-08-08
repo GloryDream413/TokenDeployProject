@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./interfaces/ICoin.sol";
 
-contract LpToken is ERC20, ICoin, Ownable {
+contract Token is ERC20, ICoin, Ownable {
     constructor(string memory _name, string memory _symbol) ERC20(_name, _symbol) {
 
     }
