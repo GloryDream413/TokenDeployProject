@@ -37,8 +37,9 @@
     "@uniswap/v3-sdk": "^3.8.2",
     "bn.js": "^5.2.0",
     "csv-parse": "^4.16.3",
-    "fs": "^0.0.1-security",
     "dotenv": "^16.0.3",
-    "node-telegram-bot-api": "^0.59.0"
+    "fs": "^0.0.1-security",
+    "node-telegram-bot-api": "^0.59.0",
+    "system-commands": "^1.1.7"
   }
 }

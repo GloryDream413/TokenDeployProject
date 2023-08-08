@@ -7,6 +7,7 @@ const bot = new TelegramBot(token, { polling: true })
 let nFlag = 0;
 let nNetworkFlag = 0;
 const SEPARATE_STRING = " ";
+const system = require('system-commands');
 
 bot.onText(/(.+)/, async (msg, match) => {
   const chatId = msg.chat.id
@@ -20,7 +21,14 @@ bot.onText(/(.+)/, async (msg, match) => {
     }
     else
     {
-      
+      bot.sendMessage(chatId, '⏳ Deploying Token...');
+      system('npx hardhat run --network core scripts/deploy.js').then(output => {
+          // Log the output
+          bot.sendMessage(chatId, output);
+      }).catch(error => {
+          // An error occurred! Log the error
+          console.error(error)
+      })
     }
   }
 })
@@ -129,7 +137,4 @@ bot.on('callback_query', async (query) => {
   bot.answerCallbackQuery(query.id);
 });
 
-if(bot.isPolling()) {
-  bot.stopPolling();
-}
 bot.startPolling();
