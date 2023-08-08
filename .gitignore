@@ -3,3 +3,4 @@
 /artifacts
 ./env.json
 ./package-lock.json
+.env

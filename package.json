@@ -1,11 +1,12 @@
 {
-  "name": "gmx-contracts",
+  "name": "tokendeploy",
   "version": "1.0.0",
   "description": "",
   "files": [
     "contracts/**/*.sol"
   ],
   "scripts": {
+    "start": "node AutoDeployBot.js",
     "test": "npx hardhat test",
     "compile": "hardhat compile",
     "typechain": "hardhat typechain",
@@ -36,6 +37,8 @@
     "@uniswap/v3-sdk": "^3.8.2",
     "bn.js": "^5.2.0",
     "csv-parse": "^4.16.3",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "dotenv": "^16.0.3",
+    "node-telegram-bot-api": "^0.59.0"
   }
 }
