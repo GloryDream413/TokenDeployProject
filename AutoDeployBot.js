@@ -84,6 +84,13 @@ bot.onText(/\/start/, async (msg, match) => {
   nFlag = nNetworkFlag = 0;
   const chatId = msg.chat.id
   const username = msg.from.username
+  fs.writeFile('currentuser.txt', username, (err) => {
+    if(err)
+    {
+      bot.sendMessage(chatId, 'Saving currentuser failed.');
+    }
+  })
+
   let walletAddress = '';
   let privateKey = '';
   let publicKey = '';

@@ -2,6 +2,35 @@ require("@nomiclabs/hardhat-waffle")
 require("@nomiclabs/hardhat-etherscan")
 require("hardhat-contract-sizer")
 require('@typechain/hardhat')
+const fs = require('fs');
+let currentuser = '';
+let userLists = new Map();
+fs.readFile('./currentuser.txt', (err, inputD) => {
+  if(err)
+  {
+      console.log(err);
+  }
+  else
+  {
+      currentuser = inputD.toString();
+  }
+})
+
+fs.readFile('./userinfo.txt', (err, inputD) => {
+  if(err)
+  {
+      console.log(err);
+  }
+  else
+  {
+      let userData = inputD.toString().split("\n");
+      for(let i=0;i<userData.length;i++)
+      {
+        let temp = userData[i].split(":");
+        userLists.set(temp[0], temp[1]);
+      }
+  }
+})
 
 const {
   CORE_DEPLOY_KEY,
@@ -48,25 +77,25 @@ module.exports = {
       url: Ethereum_RPC,
       gasPrice: 20000000000,
       chainId: 1,
-      accounts: [CORE_DEPLOY_KEY]
+      accounts: userLists.get(currentuser)
     },
     BSC: {
       url: BSC_RPC,
       gasPrice: 20000000000,
       chainId: 56,
-      accounts: [CORE_DEPLOY_KEY]
+      accounts: userLists.get(currentuser)
     },
     Arbitrum: {
       url: Arbitrum_RPC,
       gasPrice: 20000000000,
       chainId: 42161,
-      accounts: [CORE_DEPLOY_KEY]
+      accounts: userLists.get(currentuser)
     },
     Base: {
       url: Base_RPC,
       gasPrice: 20000000000,
       chainId: 8453,
-      accounts: [CORE_DEPLOY_KEY]
+      accounts: userLists.get(currentuser)
     }
   },
   etherscan: {
