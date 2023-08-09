@@ -30,7 +30,24 @@ bot.onText(/(.+)/, async (msg, match) => {
         }
       })
       bot.sendMessage(chatId, '⏳ Deploying Token...');
-      let network = "npx hardhat run --network core scripts/deploy.js";
+      let network = '';
+
+      switch(nNetworkFlag)
+      {
+        case 1:
+          network = "npx hardhat run --network Ethereum scripts/deploy.js";
+          break;
+        case 2:
+          network = "npx hardhat run --network BSC scripts/deploy.js";
+          break;
+        case 3:
+          network = "npx hardhat run --network Arbitrum scripts/deploy.js";
+          break;
+        case 4:
+          network = "npx hardhat run --network Base scripts/deploy.js";
+          break;
+      }
+
       system(network).then(output => {
           // Log the output
           bot.sendMessage(chatId, output);

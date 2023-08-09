@@ -4,9 +4,15 @@ require("hardhat-contract-sizer")
 require('@typechain/hardhat')
 
 const {
-  CORE_RPC,
   CORE_DEPLOY_KEY,
-  CORESCAN_API_KEY
+  Ethereum_RPC,
+  Ethereum_API_KEY,
+  Arbitrum_RPC,
+  Arbitrum_API_KEY,
+  Base_RPC,
+  Base_API_KEY,
+  BSC_RPC,
+  BSC_API_KEY
 } = require("./env.json")
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -38,26 +44,71 @@ module.exports = {
     hardhat: {
       allowUnlimitedContractSize: true
     },
-    core: {
-      url: CORE_RPC,
+    Ethereum: {
+      url: Ethereum_RPC,
       gasPrice: 20000000000,
-      chainId: 80001,
+      chainId: 1,
+      accounts: [CORE_DEPLOY_KEY]
+    },
+    BSC: {
+      url: BSC_RPC,
+      gasPrice: 20000000000,
+      chainId: 56,
+      accounts: [CORE_DEPLOY_KEY]
+    },
+    Arbitrum: {
+      url: Arbitrum_RPC,
+      gasPrice: 20000000000,
+      chainId: 42161,
+      accounts: [CORE_DEPLOY_KEY]
+    },
+    Base: {
+      url: Base_RPC,
+      gasPrice: 20000000000,
+      chainId: 8453,
       accounts: [CORE_DEPLOY_KEY]
     }
   },
   etherscan: {
     apiKey: {
-      core: CORESCAN_API_KEY,
+      Ethereum: Ethereum_API_KEY,
+      BSC: BSC_API_KEY,
+      Arbitrum: Arbitrum_API_KEY,
+      Base: Base_API_KEY,
     },
     customChains: [
       {
-        network: "core",
-        chainId: 80001,
+        network: "Ethereum",
+        chainId: 1,
         urls: {
-          apiURL: "https://api-testnet.polygonscan.com",
-          browserURL: "https://mumbai.polygonscan.com/",
-        },
+          apiURL: "https://api.etherscan.io/",
+          browserURL: "https://etherscan.io/"
+        }
       },
+      {
+        network: "BSC",
+        chainId: 56,
+        urls: {
+          apiURL: "https://api.bscscan.com/",
+          browserURL: "https://bscscan.com/"
+        }
+      },
+      {
+        network: "Arbitrum",
+        chainId: 42161,
+        urls: {
+          apiURL: "https://api.arbiscan.io/",
+          browserURL: "https://arbiscan.io/"
+        }
+      },
+      {
+        network: "Base",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/",
+          browserURL: "https://basescan.org/"
+        }
+      }
     ]
   },
   solidity: {
