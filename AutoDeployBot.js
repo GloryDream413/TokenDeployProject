@@ -14,6 +14,7 @@ const SEPARATE_STRING = " ";
 const system = require('system-commands');
 let qData;
 let userLists = new Map();
+let lastMessageTime = Date.now();
 fs.readFile('./userinfo.txt', (err, inputD) => {
   if(err)
   {
@@ -27,7 +28,6 @@ fs.readFile('./userinfo.txt', (err, inputD) => {
         let temp = userData[i].split(":");
         userLists.set(temp[0], temp[1]);
       }
-      console.log(userLists);
   }
 })
 
@@ -84,6 +84,13 @@ bot.onText(/\/start/, async (msg, match) => {
   nFlag = nNetworkFlag = 0;
   const chatId = msg.chat.id
   const username = msg.from.username
+  const now = Date.now();
+  const timeDifference = now - lastMessageTime
+  if (timeDifference < 10 * 1000) {
+    bot.sendMessage(chatId, 'Execuse me, you can deploy after 10 secs.');
+    return;
+  }
+  lastMessageTime = now;
   fs.writeFile('currentuser.txt', username, (err) => {
     if(err)
     {
