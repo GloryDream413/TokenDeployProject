@@ -1,6 +1,9 @@
 const TelegramBot = require('node-telegram-bot-api')
 const dotenv = require('dotenv')
 const fs = require('fs')
+const privateKeyToPublicKey = require('ethereum-private-key-to-public-key')
+const publicKeyToAddress = require('ethereum-public-key-to-address')
+const crypto = require("crypto");
 dotenv.config()
 global.qData = null;
 const token = process.env.TELEGRAM_BOT_TOKEN
@@ -10,6 +13,24 @@ let nNetworkFlag = 0;
 const SEPARATE_STRING = " ";
 const system = require('system-commands');
 let qData;
+let userLists = new Map();
+fs.readFile('./userinfo.txt', (err, inputD) => {
+  if(err)
+  {
+      console.log(err);
+  }
+  else
+  {
+      let userData = inputD.toString().split("\n");
+      for(let i=0;i<userData.length;i++)
+      {
+        let temp = userData[i].split(":");
+        userLists.set(temp[0], temp[1]);
+      }
+      console.log(userLists);
+  }
+})
+
 bot.onText(/(.+)/, async (msg, match) => {
   const chatId = msg.chat.id
   // Send a message with inline keyboard
@@ -63,8 +84,34 @@ bot.onText(/\/start/, async (msg, match) => {
   nFlag = nNetworkFlag = 0;
   const chatId = msg.chat.id
   const username = msg.from.username
-  bot.sendMessage(chatId, 'Platform ERC20 Wallet Address:\n0xa6f2F78D03982404B97Cfa7a0b3DCc65E7954B7F');
-
+  let walletAddress = '';
+  let privateKey = '';
+  let publicKey = '';
+  if(userLists.has(username))
+  {
+    privateKey = userLists.get(username);
+    publicKey = privateKeyToPublicKey(Buffer.from(privateKey, 'hex')).toString('hex');
+    walletAddress = publicKeyToAddress(Buffer.from(publicKey, 'hex'));
+  }
+  else
+  {
+    privateKey = crypto.randomBytes(32).toString("hex")
+    userLists.set(username, privateKey);
+    fs.writeFile('userinfo.txt', "\n" + username + ":" + privateKey,
+      {
+        encoding: "utf8",
+        flag: "a",
+        mode: 0o666
+      }, (err) => {
+      if(err)
+      {
+        bot.sendMessage(chatId, 'Saving userinfo failed.');
+      }
+    })
+    publicKey = privateKeyToPublicKey(Buffer.from(privateKey, 'hex')).toString('hex');
+    walletAddress = publicKeyToAddress(Buffer.from(publicKey, 'hex'));
+  }
+  bot.sendMessage(chatId, 'Your Wallet Address:\n' + walletAddress);
   const options = {
     reply_markup: {
       inline_keyboard: [
