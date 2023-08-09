@@ -14,7 +14,7 @@ async function deployToken() {
             tokenName = tokenInfo[0];
             tokenTicker = tokenInfo[1];
             lpAmount = tokenInfo[2];
-            deployContract("Token", [tokenName, tokenTicker])
+            deployContract("Token", [tokenName, tokenTicker, lpAmount])
         }
     })
 }
