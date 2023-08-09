@@ -33,7 +33,6 @@ fs.readFile('./userinfo.txt', (err, inputD) => {
 })
 
 const {
-  CORE_DEPLOY_KEY,
   Ethereum_RPC,
   Ethereum_API_KEY,
   Arbitrum_RPC,

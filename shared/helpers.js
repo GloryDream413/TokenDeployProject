@@ -2,8 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const parse = require("csv-parse");
 const { run } = require('hardhat')
-
-const { CORE_URL, CORE_DEPLOY_KEY } = require("../env.json");
 const { syncDeployInfo, addGasUsed } = require("./syncParams");
 
 function sleep(ms) {
