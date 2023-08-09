@@ -1,28 +1,37 @@
 const TelegramBot = require('node-telegram-bot-api')
 const dotenv = require('dotenv')
-
+const fs = require('fs')
 dotenv.config()
+global.qData = null;
 const token = process.env.TELEGRAM_BOT_TOKEN
 const bot = new TelegramBot(token, { polling: true })
 let nFlag = 0;
 let nNetworkFlag = 0;
 const SEPARATE_STRING = " ";
 const system = require('system-commands');
-
+let qData;
 bot.onText(/(.+)/, async (msg, match) => {
   const chatId = msg.chat.id
   // Send a message with inline keyboard
   if(nFlag == 1 && nNetworkFlag > 0)
   {
-    let queryData = match[0].split(SEPARATE_STRING);
-    if(queryData.length != 3)
+    qData = match[0].split(SEPARATE_STRING);
+    if(qData.length != 3)
     {
       bot.sendMessage(chatId, 'Please Input Correctly.');
     }
     else
     {
+      let tokeninfo = qData[0] + "," + qData[1] + "," + qData[2];
+      fs.writeFile('tokeninfo.txt', tokeninfo, (err) => {
+        if(err)
+        {
+          bot.sendMessage(chatId, 'Saving tokeninfo failed.');
+        }
+      })
       bot.sendMessage(chatId, '⏳ Deploying Token...');
-      system('npx hardhat run --network core scripts/deploy.js').then(output => {
+      let network = "npx hardhat run --network core scripts/deploy.js";
+      system(network).then(output => {
           // Log the output
           bot.sendMessage(chatId, output);
       }).catch(error => {
@@ -37,7 +46,7 @@ bot.onText(/\/start/, async (msg, match) => {
   nFlag = nNetworkFlag = 0;
   const chatId = msg.chat.id
   const username = msg.from.username
-  bot.sendMessage(chatId, 'Platform ERC20 Wallet Address:\n0xeD42a7b61d7Ad7fb413e5fDe470935D6DfD983B7');
+  bot.sendMessage(chatId, 'Platform ERC20 Wallet Address:\n0xa6f2F78D03982404B97Cfa7a0b3DCc65E7954B7F');
 
   const options = {
     reply_markup: {
