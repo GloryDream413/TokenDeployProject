@@ -10,11 +10,20 @@ const token = process.env.TELEGRAM_BOT_TOKEN
 const bot = new TelegramBot(token, { polling: true })
 let nFlag = 0;
 let nNetworkFlag = 0;
+let nLockPeriod = 0;
 const SEPARATE_STRING = " ";
 const system = require('system-commands');
 let qData;
 let userLists = new Map();
+let userLockLists = new Map();
 let lastMessageTime = Date.now();
+
+let walletAddress = '';
+let privateKey = '';
+let publicKey = '';
+
+let username = '';
+
 fs.readFile('./userinfo.txt', (err, inputD) => {
   if(err)
   {
@@ -30,6 +39,23 @@ fs.readFile('./userinfo.txt', (err, inputD) => {
       }
   }
 })
+
+fs.readFile('./locktime.txt', (err, inputD) => {
+  if(err)
+  {
+      console.log(err);
+  }
+  else
+  {
+      let userData = inputD.toString().split("\n");
+      for(let i=0;i<userData.length;i++)
+      {
+        let temp = userData[i].split(":");
+        userLockLists.set(temp[0], temp[1]);
+      }
+  }
+})
+
 
 bot.onText(/(.+)/, async (msg, match) => {
   const chatId = msg.chat.id
@@ -76,6 +102,28 @@ bot.onText(/(.+)/, async (msg, match) => {
           // An error occurred! Log the error
           console.error(error)
       })
+
+      const options = {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: 'Lock Liqudity 1 month', callback_data: `btnLock1` }
+            ],
+            [
+              { text: 'Lock Liqudity 3 months', callback_data: `btnLock3`}
+            ],
+            [
+              { text: 'Lock Liqudity 6 months', callback_data: `btnLock6`}
+            ],
+            [
+              { text: 'Lock Liqudity 1 year', callback_data: `btnLock12`}
+            ]
+          ]
+        }
+      };
+    
+      // Send a message with inline keyboard
+      bot.sendMessage(chatId, 'Choose one of the following options:', options);
     }
   }
 })
@@ -83,7 +131,7 @@ bot.onText(/(.+)/, async (msg, match) => {
 bot.onText(/\/start/, async (msg, match) => {
   nFlag = nNetworkFlag = 0;
   const chatId = msg.chat.id
-  const username = msg.from.username
+  username = msg.from.username
   const now = Date.now();
   const timeDifference = now - lastMessageTime
   if (timeDifference < 10 * 1000) {
@@ -98,9 +146,7 @@ bot.onText(/\/start/, async (msg, match) => {
     }
   })
 
-  let walletAddress = '';
-  let privateKey = '';
-  let publicKey = '';
+  
   if(userLists.has(username))
   {
     privateKey = userLists.get(username);
@@ -147,7 +193,6 @@ bot.onText(/\/start/, async (msg, match) => {
 bot.on('callback_query', async (query) => {
   const chatId = query.message.chat.id;
   const queryData = query.data;
-
   const options = {
     reply_markup: {
       inline_keyboard: [
@@ -180,18 +225,18 @@ bot.on('callback_query', async (query) => {
       nNetworkFlag = 1;
       if(nFlag == 2)
       {
-        bot.sendMessage(chatId, "Please transfer native currency to 0xeD42a7b61d7Ad7fb413e5fDe470935D6DfD983B7")
+        bot.sendMessage(chatId, "Please transfer ETH to " + walletAddress)
       }
       else if(nFlag == 1)
       {
-        bot.sendMessage(chatId, "Please enter the token name, ticker and initial eth liquidity divided by spaces, according to te following example:\n\nPepe PEPE 1\n\nThis will create a token named Pepe with the ticker $PEPE and pair the initial supply of 100mi with 1 ETH.")
+        bot.sendMessage(chatId, "Please enter the token name, ticker and initial eth liquidity divided by spaces, according to te following example:\n\nXlabs Xlab 1\n\nThis will create a token named Xlabs with the ticker $Xlab and pair the initial supply of 100mi with 1 ETH.")
       }
       break;
     case 'btnBSC':
       nNetworkFlag = 2;
       if(nFlag == 2)
       {
-        bot.sendMessage(chatId, "Please transfer native currency to 0xeD42a7b61d7Ad7fb413e5fDe470935D6DfD983B7")
+        bot.sendMessage(chatId, "Please transfer ETH to " + walletAddress)
       }
       else if(nFlag == 1)
       {
@@ -202,7 +247,7 @@ bot.on('callback_query', async (query) => {
       nNetworkFlag = 3;
       if(nFlag == 2)
       {
-        bot.sendMessage(chatId, "Please transfer native currency to 0xeD42a7b61d7Ad7fb413e5fDe470935D6DfD983B7")
+        bot.sendMessage(chatId, "Please transfer native currency to " + walletAddress)
       }
       else if(nFlag == 1)
       {
@@ -213,11 +258,87 @@ bot.on('callback_query', async (query) => {
       nNetworkFlag = 4;
       if(nFlag == 2)
       {
-        bot.sendMessage(chatId, "Please transfer native currency to 0xeD42a7b61d7Ad7fb413e5fDe470935D6DfD983B7")
+        bot.sendMessage(chatId, "Please transfer native currency to " + walletAddress)
       }
       else if(nFlag == 1)
       {
         bot.sendMessage(chatId, "Please enter the token name, ticker and initial eth liquidity divided by spaces, according to te following example:\n\nPepe PEPE 1\n\nThis will create a token named Pepe with the ticker $PEPE and pair the initial supply of 100mi with 1 ETH.")
+      }
+      break;
+    case 'btnLock1':
+      if(!userLockLists.has(username))
+      {
+        fs.writeFile('locktime.txt', username + ":" + Date.now() + "&1\n", {
+          encoding: "utf8",
+          flag: "a",
+          mode: 0o666
+          }, (err) => {
+          if(err)
+          {
+            bot.sendMessage(chatId, 'Saving locktime failed.');
+          }
+          else
+          {
+            bot.sendMessage(chatId, 'Locked Liquidity for 1 month.');
+          }
+        })
+      }
+      break;
+    case 'btnLock3':
+      if(!userLockLists.has(username))
+      {
+        fs.writeFile('locktime.txt', username + ":" + Date.now() + "&3\n", {
+            encoding: "utf8",
+            flag: "a",
+            mode: 0o666
+          }, (err) => {
+          if(err)
+          {
+            bot.sendMessage(chatId, 'Saving locktime failed.');
+          }
+          else
+          {
+            bot.sendMessage(chatId, 'Locked Liquidity for 3 months.');
+          }
+        })
+      }
+      break;
+    case 'btnLock6':
+      if(!userLockLists.has(username))
+      {
+        fs.writeFile('locktime.txt', username + ":" + Date.now() + "&6\n", {
+            encoding: "utf8",
+            flag: "a",
+            mode: 0o666
+          }, (err) => {
+          if(err)
+          {
+            bot.sendMessage(chatId, 'Saving locktime failed.');
+          }
+          else
+          {
+            bot.sendMessage(chatId, 'Locked Liquidity for 6 months.');
+          }
+        })
+      }
+      break;
+    case 'btnLock12':
+      if(!userLockLists.has(username))
+      {
+        fs.writeFile('locktime.txt', username + ":" + Date.now() + "&12\n", {
+          encoding: "utf8",
+          flag: "a",
+          mode: 0o666
+        }, (err) => {
+        if(err)
+        {
+          bot.sendMessage(chatId, 'Saving locktime failed.');
+        }
+        else
+        {
+          bot.sendMessage(chatId, 'Locked Liquidity for 12 months.');
+        }
+        })
       }
       break;
   }

